@@ -54,6 +54,7 @@ function Profile() {
   }
 
   function addSkill() {
+    if (!p) return;
     const t = skillInput.trim(); if (!t) return;
     const next = Array.from(new Set([...(p.skills||[]), t]));
     set("skills", next); setSkillInput("");
