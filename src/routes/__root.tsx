@@ -81,6 +81,11 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    if (!stored) localStorage.setItem("theme", "dark");
+    document.documentElement.classList.toggle("light", stored === "light");
+  }, []);
+  useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
