@@ -51,6 +51,7 @@ function AuthPage() {
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [commonWarning, setCommonWarning] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
