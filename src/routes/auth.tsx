@@ -100,7 +100,8 @@ function AuthPage() {
     } finally { setLoading(false); }
   }
 
-  const s = strength(password);
+  const isCommon = isCommonPassword(password, fullName, email);
+  const s = strength(password, isCommon);
   const strengthColors = ["bg-destructive", "bg-destructive", "bg-warning", "bg-accent", "bg-success"];
   const strengthLabel = ["Too weak","Weak","Fair","Good","Strong"][s];
 
