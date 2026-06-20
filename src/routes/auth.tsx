@@ -12,13 +12,31 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-function strength(p: string) {
+const COMMON_PATTERNS = [
+  /^password/i, /^qwerty/i, /^admin/i, /^welcome/i, /^letmein/i, /^iloveyou/i,
+  /^[a-z]+@?\d{1,4}$/i, /^[a-z]+@123$/i, /^[a-z]+#123$/i, /^[a-z]+123$/i,
+  /^123456/, /^abc123/i,
+];
+function isCommonPassword(p: string, name?: string, email?: string) {
+  if (COMMON_PATTERNS.some(r => r.test(p))) return true;
+  const lower = p.toLowerCase();
+  if (name && name.trim().length >= 3 && lower.includes(name.trim().toLowerCase().split(/\s+/)[0])) return true;
+  if (email) {
+    const handle = email.split("@")[0]?.toLowerCase();
+    if (handle && handle.length >= 3 && lower.includes(handle)) return true;
+  }
+  return false;
+}
+function strength(p: string, common: boolean) {
+  if (!p) return 0;
   let s = 0;
   if (p.length >= 8) s++;
   if (/[A-Z]/.test(p)) s++;
   if (/[0-9]/.test(p)) s++;
   if (/[^A-Za-z0-9]/.test(p)) s++;
-  return s;
+  if (p.length >= 12) s++;
+  if (common) s = Math.min(s, 1);
+  return Math.min(s, 4);
 }
 
 function AuthPage() {
