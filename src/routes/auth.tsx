@@ -155,6 +155,7 @@ function AuthPage() {
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">{strengthLabel}</div>
                 </div>
+              )}
               {isSignup && (commonWarning || (password && isCommon)) && (
                 <div className="mt-3 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs">
                   <div className="font-medium text-warning mb-1">Please use a less common password</div>
