@@ -66,13 +66,23 @@ function AuthPage() {
         const parsed = schema.safeParse({ fullName, email, password, confirm });
         if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
 
+        if (isCommonPassword(password, fullName, email)) {
+          toast.error("Please choose a stronger, less common password.");
+          setCommonWarning(true);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email, password,
           options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/dashboard` },
         });
         if (error) {
-          if (error.message.toLowerCase().includes("registered")) toast.error("This email is already registered");
-          else toast.error(error.message);
+          const m = error.message.toLowerCase();
+          if (m.includes("registered") || m.includes("already")) toast.error("This email is already registered");
+          else if (m.includes("weak") || m.includes("pwned") || m.includes("leak") || m.includes("compromise") || m.includes("common") || m.includes("password")) {
+            setCommonWarning(true);
+            toast.error("Please choose a stronger, less common password.");
+          } else toast.error("Something went wrong. Please try again.");
           return;
         }
         toast.success("Account created successfully. Please login.");
