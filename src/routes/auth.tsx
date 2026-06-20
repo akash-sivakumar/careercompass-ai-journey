@@ -155,6 +155,16 @@ function AuthPage() {
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">{strengthLabel}</div>
                 </div>
+              {isSignup && (commonWarning || (password && isCommon)) && (
+                <div className="mt-3 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs">
+                  <div className="font-medium text-warning mb-1">Please use a less common password</div>
+                  <p className="text-muted-foreground">Avoid using your name or common combinations like Name@123. Try a mix of uppercase letters, numbers, and special characters.</p>
+                  <div className="mt-2 space-y-0.5 text-foreground/80 font-mono">
+                    <div>✓ CareerCompass@2026</div>
+                    <div>✓ DataAnalyst#Akash26</div>
+                    <div>✓ LearnAI$2026</div>
+                  </div>
+                </div>
               )}
             </Field>
             {isSignup && (
