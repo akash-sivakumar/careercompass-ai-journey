@@ -140,7 +140,7 @@ function AuthPage() {
             </Field>
             <Field label="Password">
               <div className="relative">
-                <input type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} required maxLength={72}
+                <input type={show?"text":"password"} value={password} onChange={e=>{setPassword(e.target.value); setCommonWarning(false);}} required maxLength={72}
                   className="input-base pr-10" placeholder="••••••••" />
                 <button type="button" onClick={()=>setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
