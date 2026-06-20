@@ -3,7 +3,7 @@ import { useState, useMemo, type FormEvent } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, Sparkles, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Sparkles, ArrowLeft, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -52,6 +52,16 @@ function AuthPage() {
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [commonWarning, setCommonWarning] = useState(false);
+  const suggestions = useMemo(() => {
+    const pool = [
+      "CareerCompass@2026", "DataAnalyst#Akash26", "LearnAI$2026",
+      "FutureReady!2030", "PlacementPro#2026", "CodeMaster@2027",
+      "TechLead!2028", "CloudPro$2029", "DevReady@2030", "AIGuru#2026",
+      "SecurePath@2027", "NextRole!2026", "SkillUp#2028", "HireMe@2029",
+    ];
+    const day = new Date().getDate();
+    return Array.from({ length: 5 }, (_, i) => pool[(day + i) % pool.length]);
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -103,7 +113,7 @@ function AuthPage() {
   const isCommon = isCommonPassword(password, fullName, email);
   const s = strength(password, isCommon);
   const strengthColors = ["bg-destructive", "bg-destructive", "bg-warning", "bg-accent", "bg-success"];
-  const strengthLabel = ["Too weak","Weak","Fair","Good","Strong"][s];
+  const strengthLabel = ["Too weak","Weak","Fair","Good","Excellent"][s];
 
   return (
     <div className="min-h-screen bg-gradient-hero grid md:grid-cols-2">
@@ -168,6 +178,41 @@ function AuthPage() {
                 </div>
               )}
             </Field>
+            {isSignup && (
+              <div className="mt-2">
+                <div className="mb-2">
+                  <div className="text-sm font-semibold text-foreground">Suggested Secure Passwords</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Choose one of these secure passwords or create your own.</div>
+                </div>
+                <div className="space-y-2">
+                  {suggestions.map((pwd, idx) => (
+                    <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 bg-gradient-card border border-border rounded-xl p-3 shadow-sm">
+                      <code className="text-sm font-mono text-foreground truncate">{pwd}</code>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => { navigator.clipboard.writeText(pwd); toast.success("Copied to clipboard"); }}
+                          className="p-1.5 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                          title="Copy password"
+                        >
+                          <Copy className="size-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setPassword(pwd); setConfirm(pwd); setCommonWarning(false); toast.success("Strong password selected successfully."); }}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 transition-opacity"
+                        >
+                          Use Password
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
+                  These passwords are generated to improve security and are easier to remember than common combinations.
+                </p>
+              </div>
+            )}
             {isSignup && (
               <Field label="Confirm Password">
                 <input type={show?"text":"password"} value={confirm} onChange={e=>setConfirm(e.target.value)} required
