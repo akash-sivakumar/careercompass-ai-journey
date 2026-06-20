@@ -46,7 +46,7 @@ function Landing() {
       {/* Hero */}
       <section className="px-6 md:px-12 pt-16 pb-24 max-w-7xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs text-muted-foreground mb-6">
-          <Sparkles className="size-3 text-accent" /> Powered by Lovable AI
+          <Sparkles className="size-3 text-accent" /> Powered by CareerCompass AI
         </div>
         <h1 className="text-5xl md:text-7xl font-bold leading-tight">
           Your AI co-pilot for<br/><span className="gradient-text">career & placement readiness</span>

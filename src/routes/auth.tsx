@@ -12,13 +12,31 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-function strength(p: string) {
+const COMMON_PATTERNS = [
+  /^password/i, /^qwerty/i, /^admin/i, /^welcome/i, /^letmein/i, /^iloveyou/i,
+  /^[a-z]+@?\d{1,4}$/i, /^[a-z]+@123$/i, /^[a-z]+#123$/i, /^[a-z]+123$/i,
+  /^123456/, /^abc123/i,
+];
+function isCommonPassword(p: string, name?: string, email?: string) {
+  if (COMMON_PATTERNS.some(r => r.test(p))) return true;
+  const lower = p.toLowerCase();
+  if (name && name.trim().length >= 3 && lower.includes(name.trim().toLowerCase().split(/\s+/)[0])) return true;
+  if (email) {
+    const handle = email.split("@")[0]?.toLowerCase();
+    if (handle && handle.length >= 3 && lower.includes(handle)) return true;
+  }
+  return false;
+}
+function strength(p: string, common: boolean) {
+  if (!p) return 0;
   let s = 0;
   if (p.length >= 8) s++;
   if (/[A-Z]/.test(p)) s++;
   if (/[0-9]/.test(p)) s++;
   if (/[^A-Za-z0-9]/.test(p)) s++;
-  return s;
+  if (p.length >= 12) s++;
+  if (common) s = Math.min(s, 1);
+  return Math.min(s, 4);
 }
 
 function AuthPage() {
@@ -33,6 +51,7 @@ function AuthPage() {
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [commonWarning, setCommonWarning] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -48,13 +67,23 @@ function AuthPage() {
         const parsed = schema.safeParse({ fullName, email, password, confirm });
         if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
 
+        if (isCommonPassword(password, fullName, email)) {
+          toast.error("Please choose a stronger, less common password.");
+          setCommonWarning(true);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email, password,
           options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/dashboard` },
         });
         if (error) {
-          if (error.message.toLowerCase().includes("registered")) toast.error("This email is already registered");
-          else toast.error(error.message);
+          const m = error.message.toLowerCase();
+          if (m.includes("registered") || m.includes("already")) toast.error("This email is already registered");
+          else if (m.includes("weak") || m.includes("pwned") || m.includes("leak") || m.includes("compromise") || m.includes("common") || m.includes("password")) {
+            setCommonWarning(true);
+            toast.error("Please choose a stronger, less common password.");
+          } else toast.error("Something went wrong. Please try again.");
           return;
         }
         toast.success("Account created successfully. Please login.");
@@ -71,7 +100,8 @@ function AuthPage() {
     } finally { setLoading(false); }
   }
 
-  const s = strength(password);
+  const isCommon = isCommonPassword(password, fullName, email);
+  const s = strength(password, isCommon);
   const strengthColors = ["bg-destructive", "bg-destructive", "bg-warning", "bg-accent", "bg-success"];
   const strengthLabel = ["Too weak","Weak","Fair","Good","Strong"][s];
 
@@ -110,7 +140,7 @@ function AuthPage() {
             </Field>
             <Field label="Password">
               <div className="relative">
-                <input type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} required maxLength={72}
+                <input type={show?"text":"password"} value={password} onChange={e=>{setPassword(e.target.value); setCommonWarning(false);}} required maxLength={72}
                   className="input-base pr-10" placeholder="••••••••" />
                 <button type="button" onClick={()=>setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -124,6 +154,17 @@ function AuthPage() {
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">{strengthLabel}</div>
+                </div>
+              )}
+              {isSignup && (commonWarning || (password && isCommon)) && (
+                <div className="mt-3 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs">
+                  <div className="font-medium text-warning mb-1">Please use a less common password</div>
+                  <p className="text-muted-foreground">Avoid using your name or common combinations like Name@123. Try a mix of uppercase letters, numbers, and special characters.</p>
+                  <div className="mt-2 space-y-0.5 text-foreground/80 font-mono">
+                    <div>✓ CareerCompass@2026</div>
+                    <div>✓ DataAnalyst#Akash26</div>
+                    <div>✓ LearnAI$2026</div>
+                  </div>
                 </div>
               )}
             </Field>
