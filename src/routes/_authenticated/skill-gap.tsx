@@ -1,44 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Target, X } from "lucide-react";
+import { Target, TrendingUp, Clock, Award, BookOpen, Sparkles } from "lucide-react";
 import { Card, PageHeader, Btn } from "@/components/ui-kit";
+import { MultiSkillSelect, SearchableSelect, SKILL_GROUPS, TARGET_ROLES } from "@/components/searchable-select";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/skill-gap")({ component: SkillGap });
 
-const ROLES = ["Data Analyst", "Data Scientist", "Software Engineer", "AI Engineer", "Full Stack Developer"];
-
 type Result = {
+  skill_match_percentage: number;
   matched_skills: string[];
   missing_skills: { name: string; priority: "high" | "medium" | "low"; why: string }[];
-  roadmap_steps: { step: string; weeks: number }[];
-  readiness_score: number;
+  recommended_learning_path: { step: string; weeks: number; resources?: string[] }[];
+  industry_demand_level: "Low" | "Medium" | "High" | "Very High";
+  estimated_learning_time: string;
+  career_readiness_score: number;
 };
 
 function SkillGap() {
-  const [input, setInput] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
-  const [role, setRole] = useState(ROLES[0]);
+  const [role, setRole] = useState(TARGET_ROLES[0]);
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   const generate = useServerFn(generateAI);
 
-  function addSkill() {
-    const t = input.trim();
-    if (!t) return;
-    if (!skills.includes(t)) setSkills([...skills, t]);
-    setInput("");
-  }
-
   async function analyze() {
-    if (skills.length === 0) { toast.error("Add at least one skill"); return; }
+    if (skills.length === 0) { toast.error("Select at least one skill"); return; }
     setLoading(true); setResult(null);
     try {
       const { content } = await generate({ data: {
-        system: "You are a senior tech career coach. Return strict JSON with fields: matched_skills (string[]), missing_skills (array of {name, priority: 'high'|'medium'|'low', why}), roadmap_steps (array of {step, weeks: integer}), readiness_score (0-100 integer).",
-        prompt: `Current skills: ${skills.join(", ")}\nTarget role: ${role}\n\nProduce a skill gap analysis with prioritised missing skills, a step-wise roadmap, and an overall readiness score.`,
+        system: "You are a senior tech career coach. Return strict JSON: { skill_match_percentage (0-100 int), matched_skills (string[]), missing_skills (array of {name, priority: 'high'|'medium'|'low', why}), recommended_learning_path (array of {step, weeks: int, resources: string[]}), industry_demand_level ('Low'|'Medium'|'High'|'Very High'), estimated_learning_time (e.g. '3-6 months'), career_readiness_score (0-100 int) }.",
+        prompt: `Current skills: ${skills.join(", ")}\nTarget role: ${role}\n\nAnalyse the skill gap.`,
         json: true,
       }});
       setResult(JSON.parse(content));
@@ -52,28 +46,13 @@ function SkillGap() {
       <div className="grid lg:grid-cols-2 gap-6">
         <Card>
           <label className="text-sm font-medium">Your current skills</label>
-          <div className="flex gap-2 mt-2">
-            <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter" && (e.preventDefault(), addSkill())}
-              placeholder="e.g. Python, SQL, React"
-              className="flex-1 bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-ring" />
-            <Btn onClick={addSkill} type="button">Add</Btn>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-3 min-h-10">
-            {skills.map(s => (
-              <span key={s} className="px-3 py-1 rounded-full bg-muted text-xs flex items-center gap-1">
-                {s}<button onClick={()=>setSkills(skills.filter(x=>x!==s))}><X className="size-3" /></button>
-              </span>
-            ))}
+          <div className="mt-2">
+            <MultiSkillSelect values={skills} onChange={setSkills} groups={SKILL_GROUPS} />
           </div>
 
           <label className="text-sm font-medium mt-6 block">Target role</label>
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            {ROLES.map(r => (
-              <button key={r} onClick={()=>setRole(r)}
-                className={`text-sm px-3 py-2 rounded-lg border ${role===r ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}>
-                {r}
-              </button>
-            ))}
+          <div className="mt-2">
+            <SearchableSelect value={role} onChange={setRole} options={TARGET_ROLES} placeholder="Search target role..." />
           </div>
           <Btn onClick={analyze} disabled={loading} className="mt-6">{loading ? "Analyzing..." : "Run Analysis"}</Btn>
         </Card>
@@ -86,17 +65,34 @@ function SkillGap() {
             </div>
           ) : (
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="text-xs text-muted-foreground uppercase">Readiness</div>
-                  <div className="text-3xl font-bold gradient-text">{result.readiness_score}%</div>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="rounded-xl border border-border p-3">
+                  <div className="text-[10px] uppercase text-muted-foreground tracking-wider">Skill Match</div>
+                  <div className="text-2xl font-bold gradient-text">{result.skill_match_percentage}%</div>
+                  <div className="h-1.5 mt-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-gradient-primary" style={{width:`${result.skill_match_percentage}%`}}/></div>
+                </div>
+                <div className="rounded-xl border border-border p-3">
+                  <div className="text-[10px] uppercase text-muted-foreground tracking-wider">Readiness</div>
+                  <div className="text-2xl font-bold gradient-text">{result.career_readiness_score}%</div>
+                  <div className="h-1.5 mt-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-gradient-primary" style={{width:`${result.career_readiness_score}%`}}/></div>
+                </div>
+                <div className="rounded-xl border border-border p-3 flex items-center gap-2">
+                  <TrendingUp className="size-4 text-primary" />
+                  <div>
+                    <div className="text-[10px] uppercase text-muted-foreground tracking-wider">Demand</div>
+                    <div className="text-sm font-semibold">{result.industry_demand_level}</div>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-border p-3 flex items-center gap-2">
+                  <Clock className="size-4 text-accent" />
+                  <div>
+                    <div className="text-[10px] uppercase text-muted-foreground tracking-wider">Learning Time</div>
+                    <div className="text-sm font-semibold">{result.estimated_learning_time}</div>
+                  </div>
                 </div>
               </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-primary" style={{ width: `${result.readiness_score}%` }} />
-              </div>
 
-              <h3 className="font-semibold mt-6 mb-2 text-success">Matched ({result.matched_skills.length})</h3>
+              <h3 className="font-semibold mt-2 mb-2 text-success flex items-center gap-1"><Award className="size-4" />Matched ({result.matched_skills.length})</h3>
               <div className="flex flex-wrap gap-2">
                 {result.matched_skills.map(s => <span key={s} className="px-3 py-1 rounded-full bg-success/15 text-success text-xs">{s}</span>)}
               </div>
@@ -114,12 +110,15 @@ function SkillGap() {
                 ))}
               </div>
 
-              <h3 className="font-semibold mt-6 mb-2 text-primary">Recommended roadmap</h3>
+              <h3 className="font-semibold mt-6 mb-2 text-primary flex items-center gap-1"><BookOpen className="size-4" />Recommended Learning Path</h3>
               <ol className="space-y-2">
-                {result.roadmap_steps.map((s, i) => (
+                {result.recommended_learning_path.map((s, i) => (
                   <li key={i} className="flex gap-3 items-start">
                     <span className="size-6 rounded-full bg-gradient-primary text-primary-foreground text-xs grid place-items-center shrink-0">{i+1}</span>
-                    <div className="flex-1"><span>{s.step}</span> <span className="text-xs text-muted-foreground">· {s.weeks}w</span></div>
+                    <div className="flex-1">
+                      <div className="text-sm"><span>{s.step}</span> <span className="text-xs text-muted-foreground">· {s.weeks}w</span></div>
+                      {s.resources && s.resources.length > 0 && <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1"><Sparkles className="size-3" />{s.resources.join(" · ")}</div>}
+                    </div>
                   </li>
                 ))}
               </ol>
