@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { HelpWidget } from "@/components/help-widget";
 
@@ -88,10 +88,19 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     if (!stored) localStorage.setItem("theme", "dark");
-    document.documentElement.classList.toggle("light", stored === "light");
+    const initial = stored === "light" ? "light" : "dark";
+    setTheme(initial);
+    document.documentElement.classList.toggle("light", initial === "light");
+    const onThemeChange = (e: Event) => {
+      const next = (e as CustomEvent<"dark" | "light">).detail;
+      setTheme(next);
+    };
+    window.addEventListener("themechange", onThemeChange);
+    return () => window.removeEventListener("themechange", onThemeChange);
   }, []);
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -104,7 +113,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <Toaster position="top-right" theme="dark" />
+      <Toaster position="top-right" theme={theme} richColors closeButton />
       <HelpWidget />
     </QueryClientProvider>
   );

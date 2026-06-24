@@ -21,8 +21,10 @@ function Settings() {
 
   function toggleTheme(v: boolean) {
     setDark(v);
+    const next = v ? "dark" : "light";
     document.documentElement.classList.toggle("light", !v);
-    localStorage.setItem("theme", v ? "dark" : "light");
+    localStorage.setItem("theme", next);
+    window.dispatchEvent(new CustomEvent("themechange", { detail: next }));
   }
 
   async function changePassword() {

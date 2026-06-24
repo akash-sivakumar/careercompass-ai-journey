@@ -26,7 +26,7 @@ export function HelpWidget() {
               <div className="font-semibold">Need Help?</div>
               <div className="text-xs opacity-90">We're here to support you</div>
             </div>
-            <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-white/10"><X className="size-4" /></button>
+            <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-muted"><X className="size-4" /></button>
           </div>
           <div className="flex border-b border-border">
             {(["contact","faq"] as const).map(t => (
