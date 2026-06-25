@@ -8,7 +8,7 @@ import {
 import { Card, PageHeader, GhostBtn } from "@/components/ui-kit";
 import { NotificationBell } from "@/components/notification-bell";
 import { GlobalSearch } from "@/components/global-search";
-import { ensureUserStats, xpProgressInLevel, notify } from "@/lib/gamification";
+import { ensureUserStats, xpProgressInLevel, notify, unlockAchievement } from "@/lib/gamification";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
