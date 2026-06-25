@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, BookOpen, Mic, Trophy, ArrowRight, Sparkles,
   Flame, Star, Target, Map, Brain, Compass, Activity, Lock, Loader2, RefreshCw,
 } from "lucide-react";
-import { Card, PageHeader, Btn, GhostBtn } from "@/components/ui-kit";
+import { Card, PageHeader, GhostBtn } from "@/components/ui-kit";
 import { NotificationBell } from "@/components/notification-bell";
 import { GlobalSearch } from "@/components/global-search";
 import { ensureUserStats, xpProgressInLevel, notify } from "@/lib/gamification";
