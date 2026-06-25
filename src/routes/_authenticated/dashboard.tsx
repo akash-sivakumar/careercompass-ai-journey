@@ -56,6 +56,14 @@ function Dashboard() {
       setActivity((act as ActivityRow[]) ?? []);
       setCatalog((ach as Achievement[]) ?? []);
       setEarned(new Set(((earnedRows as Earned[]) ?? []).map(e => e.achievement_code)));
+      // Onboarding unlocks
+      await unlockAchievement("first_steps", { silent: true });
+      if (prof && (prof as Profile).full_name && (prof as Profile).target_role) {
+        await unlockAchievement("profile_complete", { silent: true });
+      }
+      if ((prof as Profile)?.resume_score && (prof as Profile).resume_score! >= 80) {
+        await unlockAchievement("resume_pro", { silent: true });
+      }
     })();
   }, []);
 
