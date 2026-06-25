@@ -67,7 +67,7 @@ export async function awardXP(amount: number, opts?: { silent?: boolean }) {
   return { xp, streak, level: levelFromXP(xp) };
 }
 
-export async function logActivity(kind: string, title: string, opts?: { xp?: number; meta?: Record<string, unknown> }) {
+export async function logActivity(kind: string, title: string, opts?: { xp?: number; meta?: Record<string, any> }) {
   const uid = await getUserId();
   if (!uid) return;
   const xp = opts?.xp ?? 0;
@@ -75,7 +75,7 @@ export async function logActivity(kind: string, title: string, opts?: { xp?: num
     user_id: uid,
     kind,
     title,
-    meta: opts?.meta ?? {},
+    meta: (opts?.meta ?? {}) as any,
     xp_awarded: xp,
   });
   if (xp > 0) await awardXP(xp, { silent: true });
