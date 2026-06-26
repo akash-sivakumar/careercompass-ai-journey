@@ -10,6 +10,7 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { HelpWidget } from "@/components/help-widget";
+import { CareerMentor } from "@/components/career-mentor";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -114,6 +115,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <Toaster position="top-right" theme={theme} richColors closeButton />
+      <CareerMentor />
       <HelpWidget />
     </QueryClientProvider>
   );
