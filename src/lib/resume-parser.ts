@@ -5,7 +5,9 @@ export async function parseResumeFile(file: File): Promise<string> {
     return (await file.text()).slice(0, 20000);
   }
   if (name.endsWith(".docx")) {
-    const mammoth = await import("mammoth/mammoth.browser");
+    const mammoth = (await import("mammoth/mammoth.browser" as string)) as {
+      extractRawText: (input: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }>;
+    };
     const buf = await file.arrayBuffer();
     const { value } = await mammoth.extractRawText({ arrayBuffer: buf });
     return (value || "").slice(0, 20000);
@@ -22,7 +24,7 @@ export async function parseResumeFile(file: File): Promise<string> {
     for (let i = 1; i <= maxPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      const strs = content.items.map((it: { str?: string }) => it.str || "").join(" ");
+      const strs = content.items.map((it) => ("str" in it ? it.str : "")).join(" ");
       out += strs + "\n\n";
       if (out.length > 20000) break;
     }
