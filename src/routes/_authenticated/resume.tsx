@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchableSelect } from "@/components/searchable-select";
 import { parseResumeFile } from "@/lib/resume-parser";
-import { awardXP, logActivity, unlockAchievement } from "@/lib/gamification";
+import { logActivity, unlockAchievement } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/resume")({ component: ResumePage });
 
@@ -101,7 +101,6 @@ Be specific, role-aware, and reference actual content from the resume. Include 3
       }
       await logActivity("resume_analyze", `Resume analyzed for ${targetRole}`, { xp: 50, meta: { score: parsed.ats_score } });
       if (parsed.ats_score >= 80) await unlockAchievement("resume_pro");
-      else await awardXP(0, { silent: true });
       toast.success("Analysis complete");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Analysis failed"); }
     finally { setLoading(false); }
