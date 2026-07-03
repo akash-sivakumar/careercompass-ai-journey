@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { getLesson, getTrack } from "@/content/learn";
+import type { Lesson, Track } from "@/content/learn/types";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { awardXP, logActivity, unlockAchievement } from "@/lib/gamification";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/learn/$track/$slug")({
 });
 
 function LessonPage() {
-  const { track, lesson } = Route.useLoaderData();
+  const { track, lesson } = Route.useLoaderData() as { track: Track; lesson: Lesson };
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);

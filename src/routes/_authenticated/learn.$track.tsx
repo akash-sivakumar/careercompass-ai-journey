@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getTrack } from "@/content/learn";
+import type { Track } from "@/content/learn/types";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, CheckCircle2, Circle, Clock, Sparkles } from "lucide-react";
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/learn/$track")({
 });
 
 function TrackPage() {
-  const { track } = Route.useLoaderData();
+  const { track } = Route.useLoaderData() as { track: Track };
   const [progress, setProgress] = useState<Record<string, string>>({});
   const [aiTopic, setAiTopic] = useState("");
   const [aiLoading, setAiLoading] = useState(false);

@@ -21,11 +21,14 @@ import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMockInterviewRouteImport } from './routes/_authenticated/mock-interview'
+import { Route as AuthenticatedLearnRouteImport } from './routes/_authenticated/learn'
 import { Route as AuthenticatedInterviewPrepRouteImport } from './routes/_authenticated/interview-prep'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCareerRouteImport } from './routes/_authenticated/career'
 import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticated/aptitude'
 import { Route as AuthenticatedLearnIndexRouteImport } from './routes/_authenticated/learn.index'
+import { Route as AuthenticatedLearnTrackRouteImport } from './routes/_authenticated/learn.$track'
+import { Route as AuthenticatedLearnTrackSlugRouteImport } from './routes/_authenticated/learn.$track.$slug'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -87,6 +90,11 @@ const AuthenticatedMockInterviewRoute =
     path: '/mock-interview',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLearnRoute = AuthenticatedLearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInterviewPrepRoute =
   AuthenticatedInterviewPrepRouteImport.update({
     id: '/interview-prep',
@@ -109,10 +117,21 @@ const AuthenticatedAptitudeRoute = AuthenticatedAptitudeRouteImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLearnIndexRoute = AuthenticatedLearnIndexRouteImport.update({
-  id: '/learn/',
-  path: '/learn/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedLearnRoute,
 } as any)
+const AuthenticatedLearnTrackRoute = AuthenticatedLearnTrackRouteImport.update({
+  id: '/$track',
+  path: '/$track',
+  getParentRoute: () => AuthenticatedLearnRoute,
+} as any)
+const AuthenticatedLearnTrackSlugRoute =
+  AuthenticatedLearnTrackSlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => AuthenticatedLearnTrackRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/career': typeof AuthenticatedCareerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/interview-prep': typeof AuthenticatedInterviewPrepRoute
+  '/learn': typeof AuthenticatedLearnRouteWithChildren
   '/mock-interview': typeof AuthenticatedMockInterviewRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
@@ -130,7 +150,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/skill-gap': typeof AuthenticatedSkillGapRoute
   '/api/mentor': typeof ApiMentorRoute
+  '/learn/$track': typeof AuthenticatedLearnTrackRouteWithChildren
   '/learn/': typeof AuthenticatedLearnIndexRoute
+  '/learn/$track/$slug': typeof AuthenticatedLearnTrackSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,7 +170,9 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/skill-gap': typeof AuthenticatedSkillGapRoute
   '/api/mentor': typeof ApiMentorRoute
+  '/learn/$track': typeof AuthenticatedLearnTrackRouteWithChildren
   '/learn': typeof AuthenticatedLearnIndexRoute
+  '/learn/$track/$slug': typeof AuthenticatedLearnTrackSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +185,7 @@ export interface FileRoutesById {
   '/_authenticated/career': typeof AuthenticatedCareerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/interview-prep': typeof AuthenticatedInterviewPrepRoute
+  '/_authenticated/learn': typeof AuthenticatedLearnRouteWithChildren
   '/_authenticated/mock-interview': typeof AuthenticatedMockInterviewRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
@@ -168,7 +193,9 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/skill-gap': typeof AuthenticatedSkillGapRoute
   '/api/mentor': typeof ApiMentorRoute
+  '/_authenticated/learn/$track': typeof AuthenticatedLearnTrackRouteWithChildren
   '/_authenticated/learn/': typeof AuthenticatedLearnIndexRoute
+  '/_authenticated/learn/$track/$slug': typeof AuthenticatedLearnTrackSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +208,7 @@ export interface FileRouteTypes {
     | '/career'
     | '/dashboard'
     | '/interview-prep'
+    | '/learn'
     | '/mock-interview'
     | '/profile'
     | '/resume'
@@ -188,7 +216,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/skill-gap'
     | '/api/mentor'
+    | '/learn/$track'
     | '/learn/'
+    | '/learn/$track/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,7 +236,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/skill-gap'
     | '/api/mentor'
+    | '/learn/$track'
     | '/learn'
+    | '/learn/$track/$slug'
   id:
     | '__root__'
     | '/'
@@ -218,6 +250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/career'
     | '/_authenticated/dashboard'
     | '/_authenticated/interview-prep'
+    | '/_authenticated/learn'
     | '/_authenticated/mock-interview'
     | '/_authenticated/profile'
     | '/_authenticated/resume'
@@ -225,7 +258,9 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/skill-gap'
     | '/api/mentor'
+    | '/_authenticated/learn/$track'
     | '/_authenticated/learn/'
+    | '/_authenticated/learn/$track/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -323,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMockInterviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/learn': {
+      id: '/_authenticated/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof AuthenticatedLearnRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/interview-prep': {
       id: '/_authenticated/interview-prep'
       path: '/interview-prep'
@@ -353,26 +395,67 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/learn/': {
       id: '/_authenticated/learn/'
-      path: '/learn'
+      path: '/'
       fullPath: '/learn/'
       preLoaderRoute: typeof AuthenticatedLearnIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedLearnRoute
+    }
+    '/_authenticated/learn/$track': {
+      id: '/_authenticated/learn/$track'
+      path: '/$track'
+      fullPath: '/learn/$track'
+      preLoaderRoute: typeof AuthenticatedLearnTrackRouteImport
+      parentRoute: typeof AuthenticatedLearnRoute
+    }
+    '/_authenticated/learn/$track/$slug': {
+      id: '/_authenticated/learn/$track/$slug'
+      path: '/$slug'
+      fullPath: '/learn/$track/$slug'
+      preLoaderRoute: typeof AuthenticatedLearnTrackSlugRouteImport
+      parentRoute: typeof AuthenticatedLearnTrackRoute
     }
   }
 }
+
+interface AuthenticatedLearnTrackRouteChildren {
+  AuthenticatedLearnTrackSlugRoute: typeof AuthenticatedLearnTrackSlugRoute
+}
+
+const AuthenticatedLearnTrackRouteChildren: AuthenticatedLearnTrackRouteChildren =
+  {
+    AuthenticatedLearnTrackSlugRoute: AuthenticatedLearnTrackSlugRoute,
+  }
+
+const AuthenticatedLearnTrackRouteWithChildren =
+  AuthenticatedLearnTrackRoute._addFileChildren(
+    AuthenticatedLearnTrackRouteChildren,
+  )
+
+interface AuthenticatedLearnRouteChildren {
+  AuthenticatedLearnTrackRoute: typeof AuthenticatedLearnTrackRouteWithChildren
+  AuthenticatedLearnIndexRoute: typeof AuthenticatedLearnIndexRoute
+}
+
+const AuthenticatedLearnRouteChildren: AuthenticatedLearnRouteChildren = {
+  AuthenticatedLearnTrackRoute: AuthenticatedLearnTrackRouteWithChildren,
+  AuthenticatedLearnIndexRoute: AuthenticatedLearnIndexRoute,
+}
+
+const AuthenticatedLearnRouteWithChildren =
+  AuthenticatedLearnRoute._addFileChildren(AuthenticatedLearnRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
   AuthenticatedCareerRoute: typeof AuthenticatedCareerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInterviewPrepRoute: typeof AuthenticatedInterviewPrepRoute
+  AuthenticatedLearnRoute: typeof AuthenticatedLearnRouteWithChildren
   AuthenticatedMockInterviewRoute: typeof AuthenticatedMockInterviewRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
   AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSkillGapRoute: typeof AuthenticatedSkillGapRoute
-  AuthenticatedLearnIndexRoute: typeof AuthenticatedLearnIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -380,13 +463,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCareerRoute: AuthenticatedCareerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInterviewPrepRoute: AuthenticatedInterviewPrepRoute,
+  AuthenticatedLearnRoute: AuthenticatedLearnRouteWithChildren,
   AuthenticatedMockInterviewRoute: AuthenticatedMockInterviewRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
   AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSkillGapRoute: AuthenticatedSkillGapRoute,
-  AuthenticatedLearnIndexRoute: AuthenticatedLearnIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
