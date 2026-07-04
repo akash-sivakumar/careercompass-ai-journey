@@ -24,14 +24,19 @@ export type Lesson = {
   xp?: number;
 };
 
+export type TrackCategory = "programming" | "domain";
+
 export type Track = {
   slug: string;
   language: string;
-  domain: string;
+  category: TrackCategory;
+  domain: string; // sub-grouping label within category
   tagline: string;
   description: string;
   icon: string;
   color: string;
   seeded: boolean; // hand-authored curriculum available
+  /** Topic outline used to render modules for AI-generated tracks. */
+  syllabus?: string[];
   lessons: Lesson[];
 };
