@@ -23,6 +23,21 @@ const JAVA_SYLLABUS = [
   "Concurrency", "JDBC", "Build Tools", "Final Project",
 ];
 
+const C_SYLLABUS = [
+  "Introduction", "Variables & Data Types", "Operators", "Control Flow", "Loops",
+  "Functions", "Arrays", "Strings", "Pointers", "Structures & Unions",
+  "Dynamic Memory", "File I/O", "Preprocessor & Macros", "Bitwise Operations",
+  "Final Project: Mini Shell",
+];
+
+const TS_SYLLABUS = [
+  "Why TypeScript", "Setup & tsconfig", "Primitive Types", "Objects & Interfaces",
+  "Type Aliases", "Unions & Intersections", "Generics", "Utility Types",
+  "Narrowing & Type Guards", "Enums & Literal Types", "Classes",
+  "Modules & Namespaces", "Async Types", "Working with React", "Advanced Patterns",
+  "Migrating from JavaScript", "Final Project",
+];
+
 const JS_SYLLABUS = [
   "Introduction", "Variables & Scope", "Types & Coercion", "Operators", "Control Flow",
   "Functions & Closures", "Arrays", "Objects", "ES6+ Features", "Destructuring",
@@ -43,6 +58,7 @@ const R_SYLLABUS = [
   "dplyr Basics", "tidyr & Reshaping", "ggplot2 Visualization", "Statistics",
   "Linear Regression", "R Markdown", "Final Project",
 ];
+
 
 const DATA_ANALYTICS_SYLLABUS = [
   "Excel Fundamentals", "Advanced Excel: Pivots & VLOOKUP", "SQL for Analytics",
