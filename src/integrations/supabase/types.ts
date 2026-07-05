@@ -140,6 +140,7 @@ export type Database = {
           created_at: string
           id: string
           lesson_slug: string
+          notes: string | null
           quiz_score: number | null
           quiz_total: number | null
           status: string
@@ -153,6 +154,7 @@ export type Database = {
           created_at?: string
           id?: string
           lesson_slug: string
+          notes?: string | null
           quiz_score?: number | null
           quiz_total?: number | null
           status?: string
@@ -166,6 +168,7 @@ export type Database = {
           created_at?: string
           id?: string
           lesson_slug?: string
+          notes?: string | null
           quiz_score?: number | null
           quiz_total?: number | null
           status?: string
@@ -260,6 +263,42 @@ export type Database = {
           skills?: string[] | null
           target_role?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      roadmap_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          domain: string
+          id: string
+          level_index: number
+          status: string
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          domain: string
+          id?: string
+          level_index: number
+          status?: string
+          topic: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          domain?: string
+          id?: string
+          level_index?: number
+          status?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
