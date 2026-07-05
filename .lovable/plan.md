@@ -1,64 +1,38 @@
-## Scope reality check
 
-You're asking for ~10 production-grade SaaS modules (LeetCode + Coursera + W3Schools + ATS tool + AI mentor). That is months of work, not one turn. If I try to ship all of it at once, every module ends up as a thin shell — exactly what you said the platform shouldn't be.
+Your request covers ~10 major workstreams. Trying them in one turn would take hours and almost certainly break finished modules. I'll split into 3 sequential turns, each independently shippable. Turn 1 focuses on the highest-impact fixes you called out first.
 
-I'll deliver this in **focused, high-quality milestones**. Each milestone ships real, working features — not placeholders.
+## Turn 1 — Core Learning + Roadmap fixes (this turn)
 
----
+**P1: Full lesson study page** (`learn.$track.$slug.tsx`)
+- Rebuild lesson viewer with tabbed sections: Overview & Objectives, Theory, Syntax, Examples, Practice Exercises, MCQ Quiz, Assignment, Notes, Resources.
+- Notes persist to `lesson_progress.notes` (add column).
+- Prev/Next lesson navigation, Mark Complete, XP award (already wired to gamification).
+- Resources section auto-generates links to W3Schools / MDN / GeeksforGeeks / official docs based on track+lesson.
+- Seeded tracks (Python/SQL/JS) render hand-authored content; other tracks use existing AI expansion + `ai_artifacts` cache.
 
-## Milestone 1 (this turn) — AI Career Mentor + Resume Analyzer v2
+**P2: Learning Hub category expansion** (`src/content/learn/index.ts`)
+- Programming: add Java, C, C++, TypeScript (R already present).
+- Domain: expand to your full taxonomy (Data Analytics, Data Science, AI Engineering, Web Dev, Mobile, Cloud, Cyber Security, UI/UX, Software Engineering) with syllabi. Existing seeded content preserved.
 
-These two have the highest daily-use value and unlock context for every other module.
+**P3: Roadmap completion tracking** (`roadmap.tsx`)
+- Per-topic status: Not Started / In Progress / Completed (not just per-level).
+- Persist to a new `roadmap_progress` table (user_id, domain, topic, status).
+- Progress %, XP on completion, activity_log entry, achievement check.
 
-### 1. Global AI Career Mentor (floating chatbot)
-- Floating launcher on every authenticated page (bottom-right, above HelpWidget)
-- Full chat panel using AI Elements (`Conversation`, `Message`, `PromptInput`, `Shimmer`)
-- Streams via new TanStack server route `/api/mentor` using AI SDK + Lovable AI Gateway (`google/gemini-3-flash-preview`)
-- **Context-aware**: server fn injects user's profile, resume score, target role, recent activity, XP/level into system prompt
-- Conversation persisted to localStorage (one conversation, per user) — fast, no schema churn
-- Quick-start prompts: "Review my resume", "What should I learn next?", "Mock interview tips", "Salary for my role"
-- `Mentor` system prompt scoped to career mentorship; refuses off-topic
+## Turn 2 — Dashboard, Mentor, Activity, Responsive polish
 
-### 2. Resume Analyzer v2
-- Replace target-role textbox with **searchable grouped dropdown** (Data / Software / Cloud / Security / Other — full role list you specified)
-- Accept **PDF + DOCX + TXT** uploads (parse PDF with `pdfjs-dist`, DOCX with `mammoth` — both browser-safe)
-- New AI prompt returns expanded JSON: ats_breakdown (keywords, formatting, experience, education, projects, certifications, achievements — each scored 0-100), missing_keywords, action_verb_suggestions, star_rewrites (array of {original, rewritten}), industry_benchmark
-- New UI: score gauge + 6-metric breakdown radar, keyword match panel, AI-rewritten bullets card with copy buttons, downloadable PDF report (using existing pdf skill pattern)
-- Awards XP + unlocks `resume_pro` achievement on score ≥80
+- **P4** Dashboard charts with Recharts pulling real data (Radar, Weekly XP bar, Learning progress line, Skill donut, Monthly trend).
+- **P5** Career Mentor rewrite: mode selector (Learning / Career / Resume / Interview / Project), markdown rendering with `react-markdown`, tightened system prompts per mode, structured output format.
+- **P6** Recent Activity: audit all XP-awarding code paths, ensure every one writes to `activity_log`; render on dashboard with grouped date headers.
+- **P7** Responsive audit: sidebar → drawer on mobile, bottom nav for authenticated routes on <768px, chart containers, tables → cards on mobile.
 
----
+## Turn 3 — Milestone 3 kickoff
 
-## Milestones 2-5 (future turns, in order)
+- **P8/P9** Framer Motion page transitions, XP popups, confetti on completion, streak system polish, badge grid page.
+- **P10** New routes: `/planner` (AI study planner), `/projects` (AI project generator), `/predictor` (career predictor), `/portfolio` (portfolio builder), `/jobs` (job tracker), `/analytics` (learning analytics). Each backed by a table + AI server fn.
 
-2. **Learning Hub v1** — domain → language picker, hand-authored seed curriculum for Python + SQL + JavaScript (full theory + examples + quizzes), AI-generated lesson expansion for other languages on demand, progress tracking wired to XP/achievements
-3. **Practice Arena v1** — Monaco editor + in-browser JS/Python runner (Pyodide), AI-generated problems by topic/difficulty, hidden test cases, SQL playground (sql.js), daily challenge, leaderboard (reads `user_stats`)
-4. **Roadmap v2 + Skill Gap v2 + Career AI v2** — interconnected: skill gap feeds roadmap, roadmap completion feeds career readiness, all share a shared "target role" stored on profile. Real progress tracking with checkboxes, level unlocks, XP rewards.
-5. **Mock Interview v2 + Interview Prep v2 + Aptitude v2** — voice interview via Web Speech API, multi-dimensional scoring, company/role/type filters, timed aptitude tests with sectional analytics, downloadable reports
+## Out of scope / clarifications needed
+- "Interactive code snippets" in P1: I'll ship syntax-highlighted read-only blocks with a Copy button this turn. Live in-browser execution (Monaco + Pyodide + SQL.js) is Milestone 3 Practice Arena — a separate large workstream.
+- I will NOT regenerate any existing completed feature. Files I'll touch are limited to those listed under each priority.
 
-Dashboard absorbs each milestone's data as it lands — no separate "dashboard turn" needed; it's already wired to `user_stats`, `activity_log`, and achievements.
-
----
-
-## Why this order
-
-- Mentor first → every other module gets "Ask Mentor" entry points for free
-- Resume v2 → highest-rated career-tool feature, big visible win, unblocks role-aware personalization across the rest
-- Then content-heavy modules (Learning, Practice) which need their own focused builds
-- Then the interconnection layer (Roadmap/Skill/Career) where the data model matters most
-- Interview/Aptitude last because they're most independent
-
----
-
-## Technical notes (for reference)
-
-- Mentor route: `src/routes/api/mentor.ts` with `streamText` + `toUIMessageStreamResponse`
-- Mentor context: `src/lib/mentor-context.functions.ts` (`createServerFn` + `requireSupabaseAuth`) returns profile/stats snapshot the client passes into the chat request body
-- Resume parsing: client-side (`pdfjs-dist`, `mammoth`) — keeps server fn small, no Worker-incompat native deps
-- AI Elements: install `conversation message prompt-input shimmer` via `bunx ai-elements@latest add`
-- No schema changes needed for M1 (gamification tables from last turn are sufficient)
-
----
-
-## What I need from you
-
-Confirm Milestone 1 scope and I'll build it now. If you'd rather start somewhere else (e.g. Practice Arena first), say so before I begin.
+Reply "go" to execute Turn 1 as-is, or tell me which priorities to reshuffle / drop / expand.
