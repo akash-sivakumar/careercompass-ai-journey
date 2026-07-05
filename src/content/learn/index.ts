@@ -23,6 +23,21 @@ const JAVA_SYLLABUS = [
   "Concurrency", "JDBC", "Build Tools", "Final Project",
 ];
 
+const C_SYLLABUS = [
+  "Introduction", "Variables & Data Types", "Operators", "Control Flow", "Loops",
+  "Functions", "Arrays", "Strings", "Pointers", "Structures & Unions",
+  "Dynamic Memory", "File I/O", "Preprocessor & Macros", "Bitwise Operations",
+  "Final Project: Mini Shell",
+];
+
+const TS_SYLLABUS = [
+  "Why TypeScript", "Setup & tsconfig", "Primitive Types", "Objects & Interfaces",
+  "Type Aliases", "Unions & Intersections", "Generics", "Utility Types",
+  "Narrowing & Type Guards", "Enums & Literal Types", "Classes",
+  "Modules & Namespaces", "Async Types", "Working with React", "Advanced Patterns",
+  "Migrating from JavaScript", "Final Project",
+];
+
 const JS_SYLLABUS = [
   "Introduction", "Variables & Scope", "Types & Coercion", "Operators", "Control Flow",
   "Functions & Closures", "Arrays", "Objects", "ES6+ Features", "Destructuring",
@@ -43,6 +58,7 @@ const R_SYLLABUS = [
   "dplyr Basics", "tidyr & Reshaping", "ggplot2 Visualization", "Statistics",
   "Linear Regression", "R Markdown", "Final Project",
 ];
+
 
 const DATA_ANALYTICS_SYLLABUS = [
   "Excel Fundamentals", "Advanced Excel: Pivots & VLOOKUP", "SQL for Analytics",
@@ -72,11 +88,26 @@ const AI_SYLLABUS = [
   "Evaluation & Safety", "Building an AI Product",
 ];
 
+const AI_ENG_SYLLABUS = [
+  "AI Engineering Overview", "LLM APIs & Providers", "Prompt Engineering Deep Dive",
+  "Structured Outputs & JSON Mode", "RAG Pipelines", "Chunking & Embeddings",
+  "Vector Databases (Pinecone/Weaviate)", "LangChain Fundamentals", "LangGraph & Agents",
+  "Tool Use & Function Calling", "Streaming & Cost Control", "Evaluations & Guardrails",
+  "Fine-Tuning vs RAG", "Deployment & Observability", "Capstone: RAG Assistant",
+];
+
 const WEB_SYLLABUS = [
   "How the Web Works", "HTML Fundamentals", "CSS Fundamentals", "Responsive Design",
   "Tailwind CSS", "JavaScript for the Web", "React Fundamentals", "React State & Hooks",
-  "Node.js Basics", "Express.js APIs", "REST vs GraphQL", "Authentication",
-  "Databases: SQL vs NoSQL", "Deployment", "Full-Stack Project",
+  "Node.js Basics", "Express.js APIs", "MongoDB Basics", "REST vs GraphQL",
+  "Authentication", "Databases: SQL vs NoSQL", "Deployment", "Full-Stack Project",
+];
+
+const MOBILE_SYLLABUS = [
+  "Mobile Landscape", "Flutter Fundamentals", "Dart Basics", "Flutter Widgets & Layout",
+  "React Native Fundamentals", "RN Navigation", "Native Modules", "State Management",
+  "Working with APIs", "Local Storage", "Push Notifications", "Android Basics (Kotlin)",
+  "iOS Basics (Swift)", "App Store & Play Store Publishing", "Capstone App",
 ];
 
 const CLOUD_SYLLABUS = [
@@ -99,6 +130,21 @@ const DEVOPS_SYLLABUS = [
   "GitHub Actions", "Terraform (IaC)", "Monitoring & Logging", "Capstone Pipeline",
 ];
 
+const UIUX_SYLLABUS = [
+  "Design Thinking", "User Research", "Personas & Journey Maps", "Information Architecture",
+  "Wireframing", "Figma Fundamentals", "Auto Layout & Components", "Prototyping in Figma",
+  "Design Systems", "Typography & Color Theory", "Accessibility (a11y)",
+  "Usability Testing", "Handoff to Developers", "Capstone: Product Redesign",
+];
+
+const SWE_SYLLABUS = [
+  "Software Engineering Principles", "Git & GitHub", "Data Structures Overview",
+  "Arrays & Strings", "Linked Lists", "Stacks & Queues", "Trees & Graphs",
+  "Hashing", "Sorting & Searching", "Recursion & Backtracking",
+  "Dynamic Programming", "OOP Principles", "Design Patterns", "System Design Basics",
+  "Scalability & Caching", "Databases & Sharding", "Interview Prep Capstone",
+];
+
 const APTITUDE_SYLLABUS = [
   "Numbers & Percentages", "Ratios & Proportions", "Time, Speed & Distance",
   "Time & Work", "Profit & Loss", "Probability & Combinatorics",
@@ -112,23 +158,30 @@ export const tracks: Track[] = [
   { slug: "python", language: "Python", category: "programming", domain: "Programming Languages", tagline: "The most versatile language in tech.", description: "From zero to job-ready Python: syntax, OOP, standard library, and a mini CLI project.", icon: "🐍", color: "from-yellow-500 to-blue-500", seeded: true, syllabus: PY_SYLLABUS, lessons: pythonLessons },
   { slug: "sql", language: "SQL", category: "programming", domain: "Programming Languages", tagline: "The universal language of data.", description: "Master SELECT to window functions, indexes, transactions, and query performance.", icon: "🗄️", color: "from-sky-500 to-indigo-600", seeded: true, syllabus: SQL_SYLLABUS, lessons: sqlLessons },
   { slug: "javascript", language: "JavaScript", category: "programming", domain: "Programming Languages", tagline: "The language of the web — and beyond.", description: "Modern ES2020+ JavaScript: closures, async/await, modules, DOM, and tooling.", icon: "🟨", color: "from-yellow-400 to-orange-500", seeded: true, syllabus: JS_SYLLABUS, lessons: javascriptLessons },
+  { slug: "typescript", language: "TypeScript", category: "programming", domain: "Programming Languages", tagline: "JavaScript with types.", description: "Static types, generics, utility types, and building typed React apps.", icon: "🟦", color: "from-blue-500 to-sky-700", seeded: false, syllabus: TS_SYLLABUS, lessons: [] },
   { slug: "java", language: "Java", category: "programming", domain: "Programming Languages", tagline: "Enterprise workhorse.", description: "Object-oriented Java: classes, collections, streams, and concurrency.", icon: "☕", color: "from-orange-500 to-red-600", seeded: false, syllabus: JAVA_SYLLABUS, lessons: [] },
+  { slug: "c", language: "C", category: "programming", domain: "Programming Languages", tagline: "The mother of modern languages.", description: "Low-level essentials: pointers, memory, structs, and systems basics.", icon: "🔡", color: "from-slate-400 to-slate-700", seeded: false, syllabus: C_SYLLABUS, lessons: [] },
   { slug: "cpp", language: "C++", category: "programming", domain: "Programming Languages", tagline: "Performance-critical systems.", description: "Pointers, memory, OOP, templates, and the STL.", icon: "➕", color: "from-indigo-500 to-purple-600", seeded: false, syllabus: CPP_SYLLABUS, lessons: [] },
   { slug: "r", language: "R Programming", category: "programming", domain: "Programming Languages", tagline: "Statistics and data science in R.", description: "Vectors, data frames, dplyr, ggplot2, and modeling.", icon: "📊", color: "from-blue-400 to-blue-700", seeded: false, syllabus: R_SYLLABUS, lessons: [] },
 
   // ========== DOMAIN KNOWLEDGE ==========
-  { slug: "data-analytics", language: "Data Analytics", category: "domain", domain: "Data & AI", tagline: "Turn raw data into decisions.", description: "Excel, SQL, Power BI, statistics, dashboards, and business analytics.", icon: "📈", color: "from-emerald-500 to-teal-600", seeded: false, syllabus: DATA_ANALYTICS_SYLLABUS, lessons: [] },
-  { slug: "data-science", language: "Data Science", category: "domain", domain: "Data & AI", tagline: "Python-powered data science.", description: "NumPy, Pandas, visualization, statistics, and ML foundations.", icon: "🔬", color: "from-cyan-500 to-blue-600", seeded: false, syllabus: DATA_SCIENCE_SYLLABUS, lessons: [] },
+  { slug: "data-analytics", language: "Data Analytics", category: "domain", domain: "Data & AI", tagline: "Turn raw data into decisions.", description: "Excel, SQL, Power BI, Tableau, statistics, EDA, and dashboards.", icon: "📈", color: "from-emerald-500 to-teal-600", seeded: false, syllabus: DATA_ANALYTICS_SYLLABUS, lessons: [] },
+  { slug: "data-science", language: "Data Science", category: "domain", domain: "Data & AI", tagline: "Python-powered data science.", description: "NumPy, Pandas, visualization, statistics, ML, DL, NLP, and CV foundations.", icon: "🔬", color: "from-cyan-500 to-blue-600", seeded: false, syllabus: DATA_SCIENCE_SYLLABUS, lessons: [] },
   { slug: "machine-learning", language: "Machine Learning", category: "domain", domain: "Data & AI", tagline: "Classical ML end-to-end.", description: "Regression, classification, clustering, feature engineering, and evaluation.", icon: "🤖", color: "from-purple-500 to-pink-600", seeded: false, syllabus: ML_SYLLABUS, lessons: [] },
   { slug: "ai", language: "Artificial Intelligence", category: "domain", domain: "Data & AI", tagline: "Modern AI, LLMs, and agents.", description: "Generative AI, prompt engineering, RAG, agents, and fine-tuning.", icon: "🧠", color: "from-fuchsia-500 to-purple-700", seeded: false, syllabus: AI_SYLLABUS, lessons: [] },
+  { slug: "ai-engineering", language: "AI Engineering", category: "domain", domain: "Data & AI", tagline: "Build production LLM apps.", description: "LLM APIs, RAG pipelines, vector DBs, LangChain, agents, evaluations, and deployment.", icon: "⚡", color: "from-violet-500 to-fuchsia-600", seeded: false, syllabus: AI_ENG_SYLLABUS, lessons: [] },
 
-  { slug: "web-development", language: "Web Development", category: "domain", domain: "Engineering", tagline: "Full-stack web from HTML to APIs.", description: "HTML, CSS, JavaScript, React, Tailwind, Node.js, Express, auth, databases.", icon: "🌐", color: "from-pink-500 to-rose-600", seeded: false, syllabus: WEB_SYLLABUS, lessons: [] },
+  { slug: "web-development", language: "Web Development", category: "domain", domain: "Engineering", tagline: "Full-stack web from HTML to APIs.", description: "HTML, CSS, JavaScript, React, Node.js, Express, MongoDB, auth, deployment.", icon: "🌐", color: "from-pink-500 to-rose-600", seeded: false, syllabus: WEB_SYLLABUS, lessons: [] },
+  { slug: "mobile-development", language: "Mobile Development", category: "domain", domain: "Engineering", tagline: "Ship mobile apps cross-platform.", description: "Flutter, React Native, native Android (Kotlin), and iOS (Swift) foundations.", icon: "📱", color: "from-teal-500 to-emerald-600", seeded: false, syllabus: MOBILE_SYLLABUS, lessons: [] },
   { slug: "cloud-computing", language: "Cloud Computing", category: "domain", domain: "Engineering", tagline: "AWS, Azure, GCP fundamentals.", description: "Compute, storage, networking, containers, CI/CD, and cost optimization.", icon: "☁️", color: "from-sky-400 to-blue-600", seeded: false, syllabus: CLOUD_SYLLABUS, lessons: [] },
   { slug: "cyber-security", language: "Cyber Security", category: "domain", domain: "Engineering", tagline: "Defend and probe systems.", description: "Networking, Linux, ethical hacking, and penetration testing basics.", icon: "🔐", color: "from-slate-500 to-slate-800", seeded: false, syllabus: CYBER_SYLLABUS, lessons: [] },
   { slug: "devops", language: "DevOps", category: "domain", domain: "Engineering", tagline: "Ship faster, more reliably.", description: "Git, Docker, Kubernetes, Jenkins, Terraform, and CI/CD pipelines.", icon: "🛠️", color: "from-amber-500 to-orange-600", seeded: false, syllabus: DEVOPS_SYLLABUS, lessons: [] },
+  { slug: "ui-ux-design", language: "UI/UX Design", category: "domain", domain: "Engineering", tagline: "Design products people love.", description: "Design thinking, Figma, design systems, prototyping, and usability testing.", icon: "🎨", color: "from-pink-400 to-fuchsia-500", seeded: false, syllabus: UIUX_SYLLABUS, lessons: [] },
+  { slug: "software-engineering", language: "Software Engineering", category: "domain", domain: "Engineering", tagline: "DSA, OOP, system design.", description: "Data structures, algorithms, OOP, design patterns, and system design fundamentals.", icon: "🧩", color: "from-indigo-400 to-purple-600", seeded: false, syllabus: SWE_SYLLABUS, lessons: [] },
 
   { slug: "aptitude-placement", language: "Aptitude & Placement", category: "domain", domain: "Career Readiness", tagline: "Ace campus placements.", description: "Quantitative, logical, verbal, coding round strategy, and HR interview prep.", icon: "🎯", color: "from-rose-500 to-red-600", seeded: false, syllabus: APTITUDE_SYLLABUS, lessons: [] },
 ];
+
 
 export function getTrack(slug: string): Track | undefined {
   return tracks.find((t) => t.slug === slug);
