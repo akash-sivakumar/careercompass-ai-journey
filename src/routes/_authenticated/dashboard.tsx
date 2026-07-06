@@ -33,11 +33,13 @@ function Dashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [activity, setActivity] = useState<ActivityRow[]>([]);
+  const [weekActivity, setWeekActivity] = useState<ActivityRow[]>([]);
   const [catalog, setCatalog] = useState<Achievement[]>([]);
   const [earned, setEarned] = useState<Set<string>>(new Set());
   const [recs, setRecs] = useState<string[]>([]);
   const [recsLoading, setRecsLoading] = useState(false);
   const generate = useServerFn(generateAI);
+
 
   useEffect(() => {
     (async () => {
