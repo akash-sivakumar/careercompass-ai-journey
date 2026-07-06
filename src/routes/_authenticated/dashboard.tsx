@@ -33,11 +33,13 @@ function Dashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [activity, setActivity] = useState<ActivityRow[]>([]);
+  const [weekActivity, setWeekActivity] = useState<ActivityRow[]>([]);
   const [catalog, setCatalog] = useState<Achievement[]>([]);
   const [earned, setEarned] = useState<Set<string>>(new Set());
   const [recs, setRecs] = useState<string[]>([]);
   const [recsLoading, setRecsLoading] = useState(false);
   const generate = useServerFn(generateAI);
+
 
   useEffect(() => {
     (async () => {
@@ -46,16 +48,20 @@ function Dashboard() {
       const uid = u.user.id;
       const s = await ensureUserStats();
       if (s) setStats(s as Stats);
-      const [{ data: prof }, { data: act }, { data: ach }, { data: earnedRows }] = await Promise.all([
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const [{ data: prof }, { data: act }, { data: weekAct }, { data: ach }, { data: earnedRows }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
         supabase.from("activity_log").select("*").eq("user_id", uid).order("created_at", { ascending: false }).limit(15),
+        supabase.from("activity_log").select("id,kind,title,xp_awarded,created_at").eq("user_id", uid).gte("created_at", weekAgo),
         supabase.from("achievements").select("*").order("xp_reward"),
         supabase.from("user_achievements").select("achievement_code, earned_at").eq("user_id", uid),
       ]);
       setProfile(prof as Profile);
       setActivity((act as ActivityRow[]) ?? []);
+      setWeekActivity((weekAct as ActivityRow[]) ?? []);
       setCatalog((ach as Achievement[]) ?? []);
       setEarned(new Set(((earnedRows as Earned[]) ?? []).map(e => e.achievement_code)));
+
       // Onboarding unlocks
       await unlockAchievement("first_steps", { silent: true });
       if (prof && (prof as Profile).full_name && (prof as Profile).target_role) {
@@ -92,11 +98,12 @@ function Dashboard() {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
       const key = dt.toISOString().slice(0, 10);
       const label = dt.toLocaleDateString("en", { weekday: "short" });
-      const xp = activity.filter(a => a.created_at.slice(0, 10) === key).reduce((s, a) => s + (a.xp_awarded || 0), 0);
+      const xp = weekActivity.filter(a => a.created_at.slice(0, 10) === key).reduce((s, a) => s + (a.xp_awarded || 0), 0);
       days.push({ d: label, xp });
     }
     return days;
-  }, [activity]);
+  }, [weekActivity]);
+
 
   const lvl = stats ? xpProgressInLevel(stats.xp) : { current: 0, needed: 500, level: 1 };
 
@@ -224,10 +231,10 @@ function Dashboard() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData}>
-                <PolarGrid stroke="hsl(var(--border))" />
-                <PolarAngleAxis dataKey="axis" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
-                <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.35} />
-                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12 }} />
+                <PolarGrid stroke="var(--border)" />
+                <PolarAngleAxis dataKey="axis" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
+                <Radar dataKey="value" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.35} />
+                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, color: "var(--card-foreground)" }} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -244,15 +251,16 @@ function Dashboard() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weekly}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="d" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
-                <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12 }} />
-                <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="d" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
+                <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} allowDecimals={false} />
+                <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.3 }} contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, color: "var(--card-foreground)" }} />
+                <Bar dataKey="xp" fill="var(--primary)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </Card>
+
       </div>
 
       {/* AI recommendations + continue */}
@@ -397,7 +405,7 @@ function ReadinessGauge({ value }: { value: number }) {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="hsl(var(--muted))" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--muted)" strokeWidth={stroke} fill="none" />
         <circle
           cx={size / 2} cy={size / 2} r={r}
           stroke={color} strokeWidth={stroke} fill="none"
