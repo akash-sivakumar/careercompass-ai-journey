@@ -48,16 +48,20 @@ function Dashboard() {
       const uid = u.user.id;
       const s = await ensureUserStats();
       if (s) setStats(s as Stats);
-      const [{ data: prof }, { data: act }, { data: ach }, { data: earnedRows }] = await Promise.all([
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const [{ data: prof }, { data: act }, { data: weekAct }, { data: ach }, { data: earnedRows }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
         supabase.from("activity_log").select("*").eq("user_id", uid).order("created_at", { ascending: false }).limit(15),
+        supabase.from("activity_log").select("id,kind,title,xp_awarded,created_at").eq("user_id", uid).gte("created_at", weekAgo),
         supabase.from("achievements").select("*").order("xp_reward"),
         supabase.from("user_achievements").select("achievement_code, earned_at").eq("user_id", uid),
       ]);
       setProfile(prof as Profile);
       setActivity((act as ActivityRow[]) ?? []);
+      setWeekActivity((weekAct as ActivityRow[]) ?? []);
       setCatalog((ach as Achievement[]) ?? []);
       setEarned(new Set(((earnedRows as Earned[]) ?? []).map(e => e.achievement_code)));
+
       // Onboarding unlocks
       await unlockAchievement("first_steps", { silent: true });
       if (prof && (prof as Profile).full_name && (prof as Profile).target_role) {
