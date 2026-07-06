@@ -405,7 +405,7 @@ function ReadinessGauge({ value }: { value: number }) {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="hsl(var(--muted))" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--muted)" strokeWidth={stroke} fill="none" />
         <circle
           cx={size / 2} cy={size / 2} r={r}
           stroke={color} strokeWidth={stroke} fill="none"
