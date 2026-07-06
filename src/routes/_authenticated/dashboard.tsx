@@ -98,11 +98,12 @@ function Dashboard() {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
       const key = dt.toISOString().slice(0, 10);
       const label = dt.toLocaleDateString("en", { weekday: "short" });
-      const xp = activity.filter(a => a.created_at.slice(0, 10) === key).reduce((s, a) => s + (a.xp_awarded || 0), 0);
+      const xp = weekActivity.filter(a => a.created_at.slice(0, 10) === key).reduce((s, a) => s + (a.xp_awarded || 0), 0);
       days.push({ d: label, xp });
     }
     return days;
-  }, [activity]);
+  }, [weekActivity]);
+
 
   const lvl = stats ? xpProgressInLevel(stats.xp) : { current: 0, needed: 500, level: 1 };
 
