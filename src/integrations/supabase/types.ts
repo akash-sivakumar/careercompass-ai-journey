@@ -215,51 +215,66 @@ export type Database = {
       profiles: {
         Row: {
           branch: string | null
+          career_readiness: number | null
           college_name: string | null
           courses_completed: number | null
           created_at: string
           degree: string | null
+          domain_interest: string | null
+          education: string | null
           email: string | null
           full_name: string | null
           graduation_year: number | null
           id: string
+          interests: string[] | null
           interview_readiness: number | null
           profile_image: string | null
           resume_score: number | null
+          selected_career: string | null
           skills: string[] | null
           target_role: string | null
           updated_at: string
         }
         Insert: {
           branch?: string | null
+          career_readiness?: number | null
           college_name?: string | null
           courses_completed?: number | null
           created_at?: string
           degree?: string | null
+          domain_interest?: string | null
+          education?: string | null
           email?: string | null
           full_name?: string | null
           graduation_year?: number | null
           id: string
+          interests?: string[] | null
           interview_readiness?: number | null
           profile_image?: string | null
           resume_score?: number | null
+          selected_career?: string | null
           skills?: string[] | null
           target_role?: string | null
           updated_at?: string
         }
         Update: {
           branch?: string | null
+          career_readiness?: number | null
           college_name?: string | null
           courses_completed?: number | null
           created_at?: string
           degree?: string | null
+          domain_interest?: string | null
+          education?: string | null
           email?: string | null
           full_name?: string | null
           graduation_year?: number | null
           id?: string
+          interests?: string[] | null
           interview_readiness?: number | null
           profile_image?: string | null
           resume_score?: number | null
+          selected_career?: string | null
           skills?: string[] | null
           target_role?: string | null
           updated_at?: string
