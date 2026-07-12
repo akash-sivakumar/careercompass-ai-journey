@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageSquare, ChevronDown } from "lucide-react";
 import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
+import { useUserProfile } from "@/hooks/use-profile";
+import { logActivity } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/interview-prep")({ component: PrepPage });
 
