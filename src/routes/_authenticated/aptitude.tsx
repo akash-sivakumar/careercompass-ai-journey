@@ -5,6 +5,8 @@ import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
+import { useUserProfile } from "@/hooks/use-profile";
+import { logActivity, unlockAchievement } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/aptitude")({ component: Aptitude });
 
