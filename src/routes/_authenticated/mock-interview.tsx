@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mic, Send, RotateCcw, Trophy, Sparkles, Target, Brain, MessageSquare, BarChart3 } from "lucide-react";
 import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { SearchableSelect, INTERVIEW_ROLES } from "@/components/searchable-select";
@@ -7,6 +7,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserProfile } from "@/hooks/use-profile";
+import { logActivity, unlockAchievement } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/mock-interview")({ component: MockInterview });
 
