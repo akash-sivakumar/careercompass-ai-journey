@@ -8,6 +8,7 @@ import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, unlockAchievement } from "@/lib/gamification";
+import { useUserProfile, saveArtifact } from "@/hooks/use-profile";
 
 export const Route = createFileRoute("/_authenticated/roadmap")({ component: Roadmap });
 
