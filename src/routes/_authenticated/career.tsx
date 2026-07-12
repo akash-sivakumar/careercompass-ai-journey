@@ -167,6 +167,21 @@ function CareerPage() {
                   <div className="text-xs text-muted-foreground">{p.job_market_insights}</div>
                 </div>
               )}
+
+              <div className="mt-4 flex items-center gap-2">
+                <Btn onClick={() => selectCareer(p)} disabled={savingCareer === p.title}>
+                  {profile?.selected_career === p.title
+                    ? <><Check className="size-4" /> Current Goal</>
+                    : savingCareer === p.title ? "Saving…" : <><MapIcon className="size-4" /> Set as Career Goal</>}
+                </Btn>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
             </Card>
           ))}
         </div>
