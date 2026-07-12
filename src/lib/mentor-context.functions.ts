@@ -19,8 +19,17 @@ export const getMentorContext = createServerFn({ method: "GET" })
       supabase.from("roadmap_progress").select("domain,level_index,topic,status").eq("user_id", userId),
     ]);
 
-    const latest: Record<string, unknown> = {};
-    (artifacts ?? []).forEach((a) => { if (!latest[a.kind]) latest[a.kind] = a; });
+    type ArtifactRow = { kind: string; title: string | null; data: unknown; created_at: string };
+    const latest: Record<string, { kind: string; title: string | null; created_at: string; summary: string }> = {};
+    ((artifacts ?? []) as ArtifactRow[]).forEach((a) => {
+      if (latest[a.kind]) return;
+      latest[a.kind] = {
+        kind: a.kind,
+        title: a.title ?? null,
+        created_at: a.created_at,
+        summary: JSON.stringify(a.data).slice(0, 400),
+      };
+    });
 
     // Summarize roadmap progress by domain
     const byDomain: Record<string, { done: number; inProg: number; total: number }> = {};
