@@ -87,8 +87,8 @@ function Dashboard() {
     { axis: "Skills", value: Math.min((profile?.skills?.length ?? 0) * 8, 100) },
     { axis: "Interview", value: profile?.interview_readiness ?? 0 },
     { axis: "Learning", value: Math.min((profile?.courses_completed ?? 0) * 15, 100) },
-    { axis: "Practice", value: Math.min((activity.filter(a => a.kind === "practice").length) * 10, 100) },
-    { axis: "Roadmap", value: Math.min((activity.filter(a => a.kind === "roadmap").length) * 20, 100) },
+    { axis: "Practice", value: Math.min((activity.filter(a => a.kind === "aptitude" || a.kind === "practice").length) * 15, 100) },
+    { axis: "Roadmap", value: Math.min((activity.filter(a => a.kind.startsWith("roadmap")).length) * 10, 100) },
   ]), [profile, activity]);
 
   // 7-day XP bar
