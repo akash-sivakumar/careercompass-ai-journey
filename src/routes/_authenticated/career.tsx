@@ -182,10 +182,3 @@ function CareerPage() {
     </div>
   );
 }
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
