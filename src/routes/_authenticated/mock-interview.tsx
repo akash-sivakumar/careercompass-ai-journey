@@ -117,7 +117,17 @@ function MockInterview() {
         prompt: `Role: ${role}\nDifficulty: ${difficulty}\nType: ${type}\n\nFull interview:\n${summary}\n\nProduce the final analytics report.`,
         json: true,
       }});
-      setReport(JSON.parse(content));
+      const parsed = JSON.parse(content) as FinalReport;
+      setReport(parsed);
+      const { data: u } = await supabase.auth.getUser();
+      if (u.user) {
+        await supabase.from("profiles").update({ interview_readiness: parsed.interview_readiness_score }).eq("id", u.user.id);
+        await supabase.from("ai_artifacts").insert({ user_id: u.user.id, kind: "mock_interview", title: `${role} · ${type}`, data: parsed as never });
+      }
+      await logActivity("mock_interview", `Mock: ${role} (${parsed.overall_score}/100)`, { xp: 60, meta: { role, score: parsed.overall_score } });
+      await unlockAchievement("first_mock_interview", { silent: true });
+      if (parsed.interview_readiness_score >= 80) await unlockAchievement("interview_ready", { silent: true });
+      if (parsed.overall_score >= 90) await unlockAchievement("interview_ace", { silent: true });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed to generate report"); }
   }
 
