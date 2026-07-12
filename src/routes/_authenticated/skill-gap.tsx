@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Target, TrendingUp, Clock, Award, BookOpen, Sparkles } from "lucide-react";
 import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { MultiSkillSelect, SearchableSelect, SKILL_GROUPS, TARGET_ROLES } from "@/components/searchable-select";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
+import { useUserProfile, saveArtifact, updateProfile } from "@/hooks/use-profile";
+import { logActivity, unlockAchievement } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/skill-gap")({ component: SkillGap });
 
@@ -20,22 +22,45 @@ type Result = {
 };
 
 function SkillGap() {
+  const { profile, artifacts } = useUserProfile();
   const [skills, setSkills] = useState<string[]>([]);
   const [role, setRole] = useState(TARGET_ROLES[0]);
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
   const generate = useServerFn(generateAI);
+
+  // Prefill from resume/profile once
+  useEffect(() => {
+    if (prefilled || !profile) return;
+    const resume = artifacts.resume?.data as { missing_skills?: string[]; matched_keywords?: string[] } | undefined;
+    const base = [...(profile.skills ?? [])];
+    if (resume?.matched_keywords) resume.matched_keywords.forEach((s) => { if (!base.includes(s)) base.push(s); });
+    if (base.length && skills.length === 0) setSkills(base.slice(0, 25));
+    const target = profile.selected_career || profile.target_role;
+    if (target && TARGET_ROLES.includes(target)) setRole(target);
+    setPrefilled(true);
+  }, [profile, artifacts, prefilled, skills.length]);
 
   async function analyze() {
     if (skills.length === 0) { toast.error("Select at least one skill"); return; }
     setLoading(true); setResult(null);
     try {
+      const resume = artifacts.resume?.data as { ats_score?: number; strengths?: string[]; weaknesses?: string[] } | undefined;
+      const resumeContext = resume ? `\nResume ATS score: ${resume.ats_score}\nResume strengths: ${(resume.strengths ?? []).join("; ")}\nResume weaknesses: ${(resume.weaknesses ?? []).join("; ")}` : "";
       const { content } = await generate({ data: {
         system: "You are a senior tech career coach. Return strict JSON: { skill_match_percentage (0-100 int), matched_skills (string[]), missing_skills (array of {name, priority: 'high'|'medium'|'low', why}), recommended_learning_path (array of {step, weeks: int, resources: string[]}), industry_demand_level ('Low'|'Medium'|'High'|'Very High'), estimated_learning_time (e.g. '3-6 months'), career_readiness_score (0-100 int) }.",
-        prompt: `Current skills: ${skills.join(", ")}\nTarget role: ${role}\n\nAnalyse the skill gap.`,
+        prompt: `Current skills: ${skills.join(", ")}\nTarget role: ${role}${resumeContext}\n\nAnalyse the skill gap.`,
         json: true,
       }});
-      setResult(JSON.parse(content));
+      const parsed = JSON.parse(content) as Result;
+      setResult(parsed);
+      await updateProfile({ skills, target_role: role, career_readiness: parsed.career_readiness_score });
+      await saveArtifact("skill_gap", role, parsed);
+      await logActivity("skill_gap", `Skill gap for ${role}`, { xp: 40, meta: { role, match: parsed.skill_match_percentage } });
+      await unlockAchievement("skill_mapped", { silent: true });
+      if (parsed.career_readiness_score >= 50) await unlockAchievement("career_ready_50", { silent: true });
+      toast.success("+40 XP · Analysis saved");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
     finally { setLoading(false); }
   }

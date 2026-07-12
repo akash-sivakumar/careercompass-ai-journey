@@ -8,6 +8,7 @@ import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, unlockAchievement } from "@/lib/gamification";
+import { useUserProfile, saveArtifact } from "@/hooks/use-profile";
 
 export const Route = createFileRoute("/_authenticated/roadmap")({ component: Roadmap });
 
@@ -39,12 +40,26 @@ const STATUS_META: Record<Status, { label: string; cls: string }> = {
 };
 
 function Roadmap() {
+  const { profile } = useUserProfile();
   const [cat, setCat] = useState(ROADMAP_DOMAINS[0]);
   const [data, setData] = useState<RoadmapData | null>(null);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<Record<string, Status>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [prefilled, setPrefilled] = useState(false);
   const generate = useServerFn(generateAI);
+
+  // Prefill domain from selected career / target role
+  useEffect(() => {
+    if (prefilled || !profile) return;
+    const cand = profile.selected_career || profile.target_role || profile.domain_interest;
+    if (cand) {
+      const match = ROADMAP_DOMAINS.find((d) => d.toLowerCase() === cand.toLowerCase())
+        || ROADMAP_DOMAINS.find((d) => cand.toLowerCase().includes(d.toLowerCase()) || d.toLowerCase().includes(cand.toLowerCase()));
+      if (match) setCat(match);
+    }
+    setPrefilled(true);
+  }, [profile, prefilled]);
 
   // Load persisted progress whenever the domain changes
   useEffect(() => {
@@ -67,7 +82,13 @@ function Roadmap() {
         prompt: `Build a complete professional learning roadmap for: ${cat}.`,
         json: true,
       }});
-      setData(JSON.parse(content));
+      const parsed = JSON.parse(content) as RoadmapData;
+      setData(parsed);
+      await saveArtifact("roadmap", cat, parsed);
+      await logActivity("roadmap_generate", `Roadmap generated: ${cat}`, { xp: 50, meta: { domain: cat } });
+      await unlockAchievement("first_roadmap", { silent: true });
+      await unlockAchievement("roadmap_started", { silent: true });
+      toast.success("+50 XP · Roadmap saved");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
     finally { setLoading(false); }
   }

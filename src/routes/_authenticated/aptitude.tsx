@@ -5,6 +5,8 @@ import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
+import { useUserProfile } from "@/hooks/use-profile";
+import { logActivity, unlockAchievement } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/aptitude")({ component: Aptitude });
 
@@ -13,6 +15,7 @@ const CATS = ["Quantitative Aptitude", "Logical Reasoning", "Verbal Ability"];
 type Q = { question: string; options: string[]; answer_index: number; explanation: string };
 
 function Aptitude() {
+  const { profile } = useUserProfile();
   const [cat, setCat] = useState(CATS[0]);
   const [qs, setQs] = useState<Q[]>([]);
   const [idx, setIdx] = useState(0);
@@ -21,7 +24,18 @@ function Aptitude() {
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [awarded, setAwarded] = useState(false);
   const generate = useServerFn(generateAI);
+
+  // Recommend category based on career (very light heuristic)
+  useEffect(() => {
+    if (!profile) return;
+    const goal = (profile.selected_career || profile.target_role || "").toLowerCase();
+    if (!goal) return;
+    if (/(data|analyst|ml|ai|engineer|scientist)/.test(goal)) setCat("Quantitative Aptitude");
+    else if (/(manager|product|business|consult)/.test(goal)) setCat("Verbal Ability");
+    else if (/(developer|software|devops|cloud)/.test(goal)) setCat("Logical Reasoning");
+  }, [profile]);
 
   useEffect(() => {
     if (!running) return;
@@ -30,7 +44,7 @@ function Aptitude() {
   }, [running]);
 
   async function load() {
-    setLoading(true); setQs([]); setPicked({}); setIdx(0); setSubmitted(false); setTime(0);
+    setLoading(true); setQs([]); setPicked({}); setIdx(0); setSubmitted(false); setTime(0); setAwarded(false);
     try {
       const { content } = await generate({ data: {
         system: "You generate aptitude test questions. Return JSON: { questions: [{question, options: string[4], answer_index: 0-3, explanation}] } with 10 questions.",
@@ -44,7 +58,16 @@ function Aptitude() {
   }
 
   function pick(i: number) { if (!submitted) setPicked(p => ({ ...p, [idx]: i })); }
-  function submit() { setSubmitted(true); setRunning(false); }
+  async function submit() {
+    setSubmitted(true); setRunning(false);
+    if (awarded) return;
+    setAwarded(true);
+    const s = qs.filter((q, i) => picked[i] === q.answer_index).length;
+    const pct = qs.length ? Math.round((s / qs.length) * 100) : 0;
+    await logActivity("aptitude", `${cat}: ${s}/${qs.length}`, { xp: 30, meta: { category: cat, score: s, total: qs.length, pct } });
+    await unlockAchievement("aptitude_completed", { silent: true });
+    toast.success(`+30 XP · Score ${s}/${qs.length}`);
+  }
   const score = qs.length ? qs.filter((q, i) => picked[i] === q.answer_index).length : 0;
 
   return (

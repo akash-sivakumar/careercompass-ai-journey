@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageSquare, ChevronDown } from "lucide-react";
 import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
+import { useUserProfile } from "@/hooks/use-profile";
+import { logActivity } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/interview-prep")({ component: PrepPage });
 
@@ -14,6 +16,7 @@ const DIFFS = ["Easy", "Medium", "Hard"] as const;
 type QA = { question: string; answer: string };
 
 function PrepPage() {
+  const { profile, artifacts } = useUserProfile();
   const [topic, setTopic] = useState(TOPICS[0]);
   const [diff, setDiff] = useState<typeof DIFFS[number]>("Medium");
   const [qas, setQas] = useState<QA[]>([]);
@@ -21,15 +24,21 @@ function PrepPage() {
   const [loading, setLoading] = useState(false);
   const generate = useServerFn(generateAI);
 
+  const goal = profile?.selected_career || profile?.target_role || "";
+
   async function load() {
     setLoading(true); setQas([]);
     try {
+      const resume = artifacts.resume?.data as { missing_skills?: string[] } | undefined;
+      const gapMissing = (artifacts.skill_gap?.data as { missing_skills?: { name: string }[] } | undefined)?.missing_skills?.map((m) => m.name) ?? [];
+      const focus = [...(resume?.missing_skills ?? []), ...gapMissing].slice(0, 8).join(", ");
       const { content } = await generate({ data: {
         system: "You are a top interview coach. Return JSON: { items: [{question, answer}] } with 8 high-quality items.",
-        prompt: `Topic: ${topic}. Difficulty: ${diff}. Provide 8 commonly asked interview questions with model answers.`,
+        prompt: `Career goal: ${goal || "general"}\nTopic: ${topic}\nDifficulty: ${diff}\n${focus ? `Emphasize weak areas: ${focus}\n` : ""}Provide 8 commonly asked interview questions with model answers.`,
         json: true,
       }});
       setQas((JSON.parse(content) as { items: QA[] }).items);
+      await logActivity("interview_prep", `Prep: ${topic} (${diff})`, { xp: 15, meta: { topic, diff, goal } });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
     finally { setLoading(false); }
   }

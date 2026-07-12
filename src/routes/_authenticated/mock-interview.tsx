@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mic, Send, RotateCcw, Trophy, Sparkles, Target, Brain, MessageSquare, BarChart3 } from "lucide-react";
 import { Card, PageHeader, Btn } from "@/components/ui-kit";
 import { SearchableSelect, INTERVIEW_ROLES } from "@/components/searchable-select";
@@ -7,6 +7,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateAI } from "@/lib/ai.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserProfile } from "@/hooks/use-profile";
+import { logActivity, unlockAchievement } from "@/lib/gamification";
 
 export const Route = createFileRoute("/_authenticated/mock-interview")({ component: MockInterview });
 
@@ -37,6 +39,7 @@ const TYPES = ["Technical Interview","HR Interview","Behavioral Interview","Syst
 const COUNTS = ["5","10","15","20"];
 
 function MockInterview() {
+  const { profile, artifacts } = useUserProfile();
   const [role, setRole] = useState(INTERVIEW_ROLES[0]);
   const [difficulty, setDifficulty] = useState("Intermediate");
   const [type, setType] = useState(TYPES[0]);
@@ -46,7 +49,15 @@ function MockInterview() {
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<FinalReport | null>(null);
+  const [prefilled, setPrefilled] = useState(false);
   const generate = useServerFn(generateAI);
+
+  useEffect(() => {
+    if (prefilled || !profile) return;
+    const cand = profile.selected_career || profile.target_role;
+    if (cand && INTERVIEW_ROLES.includes(cand)) setRole(cand);
+    setPrefilled(true);
+  }, [profile, prefilled]);
 
   const total = parseInt(count, 10);
 
@@ -54,9 +65,11 @@ function MockInterview() {
     setLoading(true);
     try {
       const prior = rounds.map(r => `Q: ${r.question}\nA: ${r.answer ?? ""}`).join("\n\n");
+      const resume = artifacts.resume?.data as { missing_skills?: string[]; strengths?: string[] } | undefined;
+      const ctx = resume ? `\nCandidate weak areas: ${(resume.missing_skills ?? []).join(", ")}` : "";
       const { content } = await generate({ data: {
         system: "You are an AI interviewer. Return JSON: { question: string }. Generate one challenging but fair interview question matching the role, difficulty and interview type. Build on previous answers when possible.",
-        prompt: `Role: ${role}\nDifficulty: ${difficulty}\nType: ${type}\nQuestion ${rounds.length+1} of ${total}\nPrevious:\n${prior || "(none)"}`,
+        prompt: `Role: ${role}\nDifficulty: ${difficulty}\nType: ${type}\nQuestion ${rounds.length+1} of ${total}${ctx}\nPrevious:\n${prior || "(none)"}`,
         json: true,
       }});
       const { question } = JSON.parse(content);
@@ -104,7 +117,17 @@ function MockInterview() {
         prompt: `Role: ${role}\nDifficulty: ${difficulty}\nType: ${type}\n\nFull interview:\n${summary}\n\nProduce the final analytics report.`,
         json: true,
       }});
-      setReport(JSON.parse(content));
+      const parsed = JSON.parse(content) as FinalReport;
+      setReport(parsed);
+      const { data: u } = await supabase.auth.getUser();
+      if (u.user) {
+        await supabase.from("profiles").update({ interview_readiness: parsed.interview_readiness_score }).eq("id", u.user.id);
+        await supabase.from("ai_artifacts").insert({ user_id: u.user.id, kind: "mock_interview", title: `${role} · ${type}`, data: parsed as never });
+      }
+      await logActivity("mock_interview", `Mock: ${role} (${parsed.overall_score}/100)`, { xp: 60, meta: { role, score: parsed.overall_score } });
+      await unlockAchievement("first_mock_interview", { silent: true });
+      if (parsed.interview_readiness_score >= 80) await unlockAchievement("interview_ready", { silent: true });
+      if (parsed.overall_score >= 90) await unlockAchievement("interview_ace", { silent: true });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed to generate report"); }
   }
 
