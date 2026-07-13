@@ -1,6 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+export type WeeklyReport = {
+  summary?: string;
+  wins?: string[];
+  weak_areas?: string[];
+  recommended_projects?: string[];
+  next_week_goals?: string[];
+  readiness_note?: string;
+};
+
 const SYSTEM = `You are a career coach writing a friendly, concise weekly report for a learner using an AI career platform. Return STRICT JSON:
 {
   "summary": "2-3 sentences on the week",
@@ -52,8 +61,8 @@ export const generateWeeklyReport = createServerFn({ method: "POST" })
     }
     const j = await res.json();
     const content = j.choices?.[0]?.message?.content ?? "{}";
-    let report: Record<string, unknown> = {};
-    try { report = JSON.parse(content) as Record<string, unknown>; } catch { report = { summary: content }; }
+    let report: WeeklyReport = {};
+    try { report = JSON.parse(content) as WeeklyReport; } catch { report = { summary: String(content) }; }
     await supabase.from("ai_artifacts").insert({ user_id: userId, kind: "weekly_report", title: `Weekly report ${new Date().toLocaleDateString()}`, data: report as never });
     return { report };
   });
