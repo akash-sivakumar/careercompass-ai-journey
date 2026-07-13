@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/analytics")({
 type LessonRow = { track: string; lesson_slug: string; status: string; quiz_score: number | null; quiz_total: number | null; completed_at: string | null };
 type ActivityRow = { kind: string; title: string; xp_awarded: number; created_at: string };
 type Stats = { xp: number; level: number; current_streak: number; longest_streak: number };
-type WeeklyReport = { summary?: string; wins?: string[]; weak_areas?: string[]; recommended_projects?: string[]; next_week_goals?: string[]; readiness_note?: string };
+
 
 function AnalyticsPage() {
   const [lessons, setLessons] = useState<LessonRow[]>([]);
