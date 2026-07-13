@@ -1,7 +1,7 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Target, Compass, Map, MessageSquare, Mic, Brain,
-  User as UserIcon, Settings, LogOut, Sparkles, BookOpen
+  User as UserIcon, Settings, LogOut, Sparkles, BookOpen, BarChart3, Rocket, Award,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,9 @@ import { toast } from "sonner";
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/learn", label: "Learning Hub", icon: BookOpen },
+  { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/projects", label: "Projects", icon: Rocket },
+  { to: "/certificates", label: "Certificates", icon: Award },
   { to: "/resume", label: "Resume Analyzer", icon: FileText },
   { to: "/skill-gap", label: "Skill Gap", icon: Target },
   { to: "/career", label: "Career AI", icon: Compass },

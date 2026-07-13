@@ -134,6 +134,48 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          created_at: string
+          credential_url: string | null
+          file_path: string | null
+          id: string
+          issue_date: string | null
+          issuer: string | null
+          platform: string | null
+          skills: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credential_url?: string | null
+          file_path?: string | null
+          id?: string
+          issue_date?: string | null
+          issuer?: string | null
+          platform?: string | null
+          skills?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credential_url?: string | null
+          file_path?: string | null
+          id?: string
+          issue_date?: string | null
+          issuer?: string | null
+          platform?: string | null
+          skills?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           completed_at: string | null
