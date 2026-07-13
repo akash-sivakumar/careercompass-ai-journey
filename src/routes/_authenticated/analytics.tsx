@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, Trophy, Flame, Clock, Sparkles, Loader2, RefreshCw, Target as TargetIcon } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from "recharts";
 import { useServerFn } from "@tanstack/react-start";
-import { generateWeeklyReport } from "@/lib/weekly-report.functions";
+import { generateWeeklyReport, type WeeklyReport } from "@/lib/weekly-report.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
