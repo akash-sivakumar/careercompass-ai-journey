@@ -52,8 +52,8 @@ export const generateWeeklyReport = createServerFn({ method: "POST" })
     }
     const j = await res.json();
     const content = j.choices?.[0]?.message?.content ?? "{}";
-    let report: unknown = {};
-    try { report = JSON.parse(content); } catch { report = { summary: content }; }
+    let report: Record<string, unknown> = {};
+    try { report = JSON.parse(content) as Record<string, unknown>; } catch { report = { summary: content }; }
     await supabase.from("ai_artifacts").insert({ user_id: userId, kind: "weekly_report", title: `Weekly report ${new Date().toLocaleDateString()}`, data: report as never });
     return { report };
   });
