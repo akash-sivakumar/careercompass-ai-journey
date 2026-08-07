@@ -257,6 +257,7 @@ export type Database = {
       profiles: {
         Row: {
           branch: string | null
+          career_goals: string | null
           career_readiness: number | null
           college_name: string | null
           courses_completed: number | null
@@ -265,12 +266,20 @@ export type Database = {
           domain_interest: string | null
           education: string | null
           email: string | null
+          experience: string | null
           full_name: string | null
+          github_url: string | null
           graduation_year: number | null
           id: string
           interests: string[] | null
           interview_readiness: number | null
+          linkedin_url: string | null
+          portfolio_url: string | null
+          preferred_domains: string[] | null
+          preferred_industry: string | null
           profile_image: string | null
+          resume_role_match: number | null
+          resume_salary_prediction: string | null
           resume_score: number | null
           selected_career: string | null
           skills: string[] | null
@@ -279,6 +288,7 @@ export type Database = {
         }
         Insert: {
           branch?: string | null
+          career_goals?: string | null
           career_readiness?: number | null
           college_name?: string | null
           courses_completed?: number | null
@@ -287,12 +297,20 @@ export type Database = {
           domain_interest?: string | null
           education?: string | null
           email?: string | null
+          experience?: string | null
           full_name?: string | null
+          github_url?: string | null
           graduation_year?: number | null
           id: string
           interests?: string[] | null
           interview_readiness?: number | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          preferred_domains?: string[] | null
+          preferred_industry?: string | null
           profile_image?: string | null
+          resume_role_match?: number | null
+          resume_salary_prediction?: string | null
           resume_score?: number | null
           selected_career?: string | null
           skills?: string[] | null
@@ -301,6 +319,7 @@ export type Database = {
         }
         Update: {
           branch?: string | null
+          career_goals?: string | null
           career_readiness?: number | null
           college_name?: string | null
           courses_completed?: number | null
@@ -309,12 +328,20 @@ export type Database = {
           domain_interest?: string | null
           education?: string | null
           email?: string | null
+          experience?: string | null
           full_name?: string | null
+          github_url?: string | null
           graduation_year?: number | null
           id?: string
           interests?: string[] | null
           interview_readiness?: number | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          preferred_domains?: string[] | null
+          preferred_industry?: string | null
           profile_image?: string | null
+          resume_role_match?: number | null
+          resume_salary_prediction?: string | null
           resume_score?: number | null
           selected_career?: string | null
           skills?: string[] | null
