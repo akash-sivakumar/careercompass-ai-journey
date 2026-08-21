@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { Eye, EyeOff, Sparkles, ArrowLeft, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    mode: s.mode === "signup" ? "signup" as const : "login" as const,
+  validateSearch: (s: Record<string, unknown>): { mode?: "signup" | "login" } => ({
+    mode: s.mode === "signup" ? "signup" : "login",
   }),
   component: AuthPage,
 });
